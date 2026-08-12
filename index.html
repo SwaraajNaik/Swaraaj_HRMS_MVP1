@@ -1,0 +1,2572 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workforce Analytics & Succession Planning Platform</title>
+
+    <!-- Typography & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- ApexCharts CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <style>
+        /* ==========================================================================
+       ENTERPRISE DESIGN SYSTEM & TOKENS
+       ========================================================================== */
+        :root {
+            /* Color Palette - Light Theme */
+            --bg-body: #f4f6f9;
+            --bg-surface: #ffffff;
+            --bg-surface-elevated: #ffffff;
+            --bg-glass: rgba(255, 255, 255, 0.75);
+            --border-color: #e2e8f0;
+            --border-color-hover: #cbd5e1;
+
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --text-inverse: #ffffff;
+
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+            --primary-border: #bfdbfe;
+
+            --secondary: #4f46e5;
+            --secondary-light: #eef2ff;
+
+            --accent-cyan: #0891b2;
+            --accent-teal: #0d9488;
+
+            /* Status Colors */
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --info: #3b82f6;
+            --info-light: #dbeafe;
+
+            /* Risk Level Colors */
+            --risk-green: #10b981;
+            --risk-yellow: #eab308;
+            --risk-orange: #f97316;
+            --risk-red: #ef4444;
+
+            /* Geometry & Elevation */
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --radius-full: 9999px;
+
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+            --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+
+            /* Layout */
+            --sidebar-width: 260px;
+            --topbar-height: 70px;
+            --filterbar-height: 56px;
+            --transition-fast: 0.15s ease;
+            --transition-normal: 0.25s ease;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #0b0f19;
+            --bg-surface: #111827;
+            --bg-surface-elevated: #1f2937;
+            --bg-glass: rgba(17, 24, 39, 0.8);
+            --border-color: #1f2937;
+            --border-color-hover: #374151;
+
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --text-inverse: #0f172a;
+
+            --primary: #3b82f6;
+            --primary-hover: #60a5fa;
+            --primary-light: rgba(59, 130, 246, 0.15);
+            --primary-border: #1e3a8a;
+
+            --secondary: #6366f1;
+            --secondary-light: rgba(99, 102, 241, 0.15);
+
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        /* Reset & Base Styles */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            line-height: 1.5;
+            overflow-x: hidden;
+            font-size: 0.875rem;
+            transition: background-color var(--transition-normal), color var(--transition-normal);
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--text-muted);
+            border-radius: var(--radius-full);
+            opacity: 0.5;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        /* Layout Structure */
+        #app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ==========================================================================
+       SIDEBAR NAVIGATION
+       ========================================================================== */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-surface);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+            transition: all var(--transition-normal);
+
+        }
+
+        .sidebar-brand {
+            height: var(--topbar-height);
+            padding: 0 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .brand-logo {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .brand-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--text-primary);
+        }
+
+        .brand-subtitle {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .menu-category {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            font-weight: 700;
+            padding: 0.75rem 0.75rem 0.25rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            padding: 0.65rem 0.85rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            font-size: 0.85rem;
+            transition: all var(--transition-fast);
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+        }
+
+        .nav-item i {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-item .badge {
+            margin-left: auto;
+            padding: 0.15rem 0.5rem;
+            border-radius: var(--radius-full);
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .badge-primary {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .badge-danger {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .badge-warning {
+            background: var(--warning-light);
+            color: var(--warning);
+        }
+
+        /* ==========================================================================
+       MAIN CONTENT WRAPPER
+       ========================================================================== */
+        .main-wrapper {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        /* Top Navbar */
+        .top-nav {
+            height: var(--topbar-height);
+            background-color: var(--bg-glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+
+        .search-container {
+            position: relative;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .search-container i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.55rem 1rem 0.55rem 2.5rem;
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-full);
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            outline: none;
+            transition: all var(--transition-fast);
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+            background: var(--bg-surface);
+        }
+
+        .top-nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .company-select {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.45rem 1rem;
+            border-radius: var(--radius-md);
+            font-size: 0.85rem;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .icon-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: var(--radius-full);
+            border: 1px solid var(--border-color);
+            background: var(--bg-surface);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            transition: all var(--transition-fast);
+        }
+
+        .icon-btn:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+            border-color: var(--primary-border);
+        }
+
+        .icon-btn .dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background-color: var(--danger);
+            border-radius: var(--radius-full);
+            border: 2px solid var(--bg-surface);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding-left: 0.5rem;
+            border-left: 1px solid var(--border-color);
+            cursor: pointer;
+            min-width: 240px;
+            flex-shrink: 0;
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: var(--radius-full);
+            object-fit: cover;
+            border: 2px solid var(--primary-border);
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .user-name,
+        .user-role {
+            white-space: nowrap;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 700;
+            font-size: 0.85rem;
+            line-height: 1.2;
+        }
+
+        .user-role {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        /* Global Filter Bar */
+        .global-filter-bar {
+            background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.75rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            overflow-x: auto;
+            white-space: normal;
+            flex-wrap: wrap;
+        }
+
+        .filter-label {
+            font-weight: 700;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-right: 0.5rem;
+        }
+
+        .filter-select {
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.35rem 0.75rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            font-weight: 500;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .filter-select:hover {
+            border-color: var(--border-color-hover);
+        }
+
+        .btn-reset-filters {
+            padding: 0.35rem 0.75rem;
+            border: 1px dashed var(--border-color);
+            background: transparent;
+            color: var(--text-muted);
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-reset-filters:hover {
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+
+        /* Content Area & Page Views */
+        .content-area {
+            padding: 2rem;
+            flex: 1;
+        }
+
+        .page-view {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .page-view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--text-primary);
+        }
+
+        .page-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.1rem;
+        }
+
+        .page-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* Button System */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.55rem 1.1rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all var(--transition-fast);
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: var(--bg-surface);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--bg-body);
+            border-color: var(--border-color-hover);
+        }
+
+        /* ==========================================================================
+       ENTERPRISE COMPONENTS: CARDS, GRIDS, TABLES
+       ========================================================================== */
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .grid-cols-12 {
+            grid-template-columns: repeat(12, 1fr);
+        }
+
+        .col-span-12 {
+            grid-column: span 12 / span 12;
+        }
+
+        .col-span-8 {
+            grid-column: span 8 / span 8;
+        }
+
+        .col-span-6 {
+            grid-column: span 6 / span 6;
+        }
+
+        .col-span-4 {
+            grid-column: span 4 / span 4;
+        }
+
+        .col-span-3 {
+            grid-column: span 3 / span 3;
+        }
+
+        .card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-fast);
+            position: relative;
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .card + .card,
+        .grid + .grid {
+            margin-top: 1rem;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .card-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 0;
+        }
+
+        .data-table th,
+        .data-table td {
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            min-width: 0;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .content-area {
+            padding: 2rem;
+        }
+        .kpi-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .kpi-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .kpi-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .kpi-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+        }
+
+        .kpi-footer {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            font-size: 0.75rem;
+        }
+
+        .trend {
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+            padding: 0.1rem 0.4rem;
+            border-radius: var(--radius-sm);
+        }
+
+        .trend-up {
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .trend-down {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        /* Tables */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.85rem;
+        }
+
+        .data-table th {
+            background-color: var(--bg-body);
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 0.5px;
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .data-table tbody tr {
+            transition: background-color var(--transition-fast);
+            cursor: pointer;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: var(--primary-light);
+        }
+
+        /* Badges & Pills */
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: var(--radius-full);
+            font-size: 0.725rem;
+            font-weight: 700;
+        }
+
+        .pill-green {
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .pill-yellow {
+            background: var(--warning-light);
+            color: var(--warning);
+        }
+
+        .pill-orange {
+            background: #ffedd5;
+            color: #c2410c;
+        }
+
+        .pill-red {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        /* Risk Score Gauge Indicator */
+        .risk-badge {
+            font-weight: 800;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            color: white;
+            font-size: 0.75rem;
+        }
+
+        /* ==========================================================================
+       SPECIALIZED VIEW COMPONENTS
+       ========================================================================== */
+
+        /* Slide-over Drawer for Employee Details */
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            display: none;
+            opacity: 0;
+            transition: opacity var(--transition-normal);
+        }
+
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: -500px;
+            bottom: 0;
+            width: 480px;
+            background: var(--bg-surface);
+            z-index: 201;
+            box-shadow: var(--shadow-lg);
+            transition: right var(--transition-normal);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .drawer-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .drawer.active {
+            right: 0;
+        }
+
+        .drawer-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .drawer-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        /* Workforce Simulator Custom Styles */
+        .simulator-container {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.03), rgba(79, 70, 229, 0.03));
+            border: 1px solid var(--primary-border);
+        }
+
+        .slider-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.4rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .range-slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border-color);
+            outline: none;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        /* Org Chart Node Styling */
+        .org-node {
+            border: 1px solid var(--border-color);
+            background: var(--bg-surface);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .org-node.current {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary-light);
+        }
+
+        /* AI Insight Cards */
+        .ai-card {
+            background: linear-gradient(135deg, var(--bg-surface), var(--primary-light));
+            border: 1px solid var(--primary-border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .pagination-btns {
+            display: flex;
+            gap: 0.4rem;
+        }
+
+        .page-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-color);
+            background: var(--bg-surface);
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+
+        .page-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            z-index: 95;
+            opacity: 0;
+            transition: opacity var(--transition-normal);
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        .top-nav {
+            gap: 1rem;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            width: 42px;
+            height: 42px;
+            border-radius: var(--radius-full);
+            border: 1px solid var(--border-color);
+            background: var(--bg-surface);
+            color: var(--text-secondary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .global-filter-bar {
+            flex-wrap: wrap;
+        }
+
+        .filter-select,
+        .btn-reset-filters,
+        .search-input,
+        .company-select,
+        .btn {
+            min-width: 0;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        @media (max-width: 1200px) {
+            .main-wrapper {
+                margin-left: 0;
+            }
+
+            .sidebar {
+                position: fixed;
+                transform: translateX(-100%);
+                width: 280px;
+                transition: transform var(--transition-normal);
+                z-index: 100;
+            }
+
+            .content-area {
+                padding: 1.5rem;
+            }
+
+            .top-nav {
+                padding: 0 1rem;
+            }
+
+            .search-container {
+                width: 100%;
+            }
+
+            .top-nav-actions {
+                flex-wrap: wrap;
+                justify-content: flex-end;
+                gap: 0.6rem;
+            }
+
+            .global-filter-bar {
+                padding: 0.75rem 1rem;
+                gap: 0.75rem;
+            }
+
+            .grid.grid-cols-12 {
+                grid-template-columns: repeat(12, minmax(0, 1fr));
+            }
+
+            .col-span-8,
+            .col-span-6,
+            .col-span-4,
+            .col-span-3 {
+                grid-column: span 12 / span 12;
+            }
+
+            .card {
+                padding: 1.25rem;
+            }
+
+            .page-header,
+            .card-header {
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .top-nav {
+                flex-direction: column;
+                align-items: stretch;
+                justify-content: flex-start;
+                padding: 1rem;
+            }
+
+            .top-nav .search-container {
+                order: 2;
+                width: 100%;
+            }
+
+            .top-nav-actions {
+                order: 3;
+                width: 100%;
+            }
+
+            .mobile-menu-btn {
+                display: inline-flex;
+            }
+
+            .top-nav .left-group {
+                width: 100%;
+            }
+
+            .company-select,
+            .search-input,
+            .filter-select,
+            .btn-reset-filters,
+            .btn {
+                width: 100%;
+            }
+
+            .user-profile {
+                justify-content: center;
+                padding-left: 0;
+                border-left: none;
+                width: 100%;
+            }
+
+            .data-table th,
+            .data-table td {
+                white-space: normal;
+            }
+
+            .page-header,
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.85rem;
+            }
+
+            .page-actions,
+            .card-header {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 640px) {
+            body {
+                font-size: 0.82rem;
+            }
+
+            .top-nav {
+                padding: 0.75rem;
+            }
+
+            .global-filter-bar {
+                padding: 0.65rem;
+            }
+
+            .search-container,
+            .top-nav-actions,
+            .company-select,
+            .search-input {
+                min-width: 0;
+            }
+
+            .drawer {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="app">
+        <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar(false)"></div>
+
+        <!-- ==========================================================================
+       SIDEBAR NAVIGATION
+       ========================================================================== -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-logo"><i class="fa-solid fa-chart-line"></i></div>
+                <div>
+                    <div class="brand-title">Workforce360</div>
+                    <div class="brand-subtitle">Enterprise Suite</div>
+                </div>
+            </div>
+
+            <div class="sidebar-menu">
+                <div class="menu-category">Main Overview</div>
+                <a class="nav-item active" onclick="navigate('page-dashboard')">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a class="nav-item" onclick="navigate('page-employees')">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Employees</span>
+                </a>
+                <a class="nav-item" onclick="navigate('page-profile')">
+                    <i class="fa-solid fa-id-card"></i>
+                    <span>Employee Profile</span>
+                </a>
+
+                <div class="menu-category">Analytics & Risk</div>
+                <a class="nav-item" onclick="navigate('page-age-analytics')">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Age Analytics</span>
+                </a>
+                <a class="nav-item" onclick="navigate('page-retirement-risk')">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span>Retirement Risk</span>
+                    <span class="badge badge-danger">214</span>
+                </a>
+                <a class="nav-item" onclick="navigate('page-critical-roles')">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span>Critical Roles</span>
+                </a>
+
+                <div class="menu-category">Talent & Skills</div>
+                <a class="nav-item" onclick="navigate('page-skills-inventory')">
+                    <i class="fa-solid fa-cubes"></i>
+                    <span>Skills Inventory</span>
+                </a>
+                <a class="nav-item" onclick="navigate('page-skill-gap')">
+                    <i class="fa-solid fa-sliders"></i>
+                    <span>Skill Gap Analysis</span>
+                </a>
+                <a class="nav-item" onclick="navigate('page-succession')">
+                    <i class="fa-solid fa-sitemap"></i>
+                    <span>Succession Planning</span>
+                </a>
+
+                <div class="menu-category">Strategy & AI</div>
+                <a class="nav-item" onclick="navigate('page-hiring-forecast')">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <span>Hiring Forecast</span>
+                </a>
+                <a class="nav-item" onclick="navigate('page-training')">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span>Training Recs</span>
+                </a>
+                <a class="nav-item" onclick="navigate('page-simulator')">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>Workforce Simulator</span>
+                    <span class="badge badge-primary">Interactive</span>
+                </a>
+                <a class="nav-item" onclick="navigate('page-ai-insights')">
+                    <i class="fa-solid fa-brain"></i>
+                    <span>AI Insights</span>
+                </a>
+
+                <div class="menu-category">Administration</div>
+                <a class="nav-item" onclick="navigate('page-reports')">
+                    <i class="fa-solid fa-file-invoice"></i>
+                    <span>Reports</span>
+                </a>
+                <a class="nav-item" onclick="navigate('page-notifications')">
+                    <i class="fa-solid fa-bell"></i>
+                    <span>Notifications</span>
+                    <span class="badge badge-warning">5</span>
+                </a>
+                <a class="nav-item" onclick="navigate('page-settings')">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Settings</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- ==========================================================================
+       MAIN CONTENT AREA
+       ========================================================================== -->
+        <div class="main-wrapper">
+
+            <!-- Top Navbar -->
+            <header class="top-nav">
+                <div class="left-group" style="display:flex; align-items:center; gap:0.75rem; width:100%;">
+                <button class="mobile-menu-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+                <div class="search-container">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" class="search-input" placeholder="Search employees, roles, skills... (Ctrl+K)">
+                </div>
+            </div>
+
+            <div class="top-nav-actions">
+                <select class="company-select">
+                        <option>Wings49 Tech Corp</option>
+                        <option>Sebastian Europe Operations</option>
+                        <option>Nidhi APAC Holdings</option>
+                    </select>
+
+                    <button class="icon-btn" onclick="toggleTheme()" title="Toggle Dark/Light Theme">
+                        <i class="fa-solid fa-moon" id="theme-icon"></i>
+                    </button>
+
+                    <button class="icon-btn" onclick="navigate('page-notifications')" title="Notifications">
+                        <i class="fa-solid fa-bell"></i>
+                        <span class="dot"></span>
+                    </button>
+
+                    <button class="btn btn-secondary" onclick="exportData()">
+                        <i class="fa-solid fa-download"></i>
+                        <span>Export</span>
+                    </button>
+
+                    <div class="user-profile" onclick="navigate('page-profile')">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
+                            alt="User" class="avatar">
+                        <div class="user-info">
+                            <span class="user-name">Swaraaj Naik</span>
+                            <span class="user-role">Chief Technology Officer</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Global Filters -->
+            <div class="global-filter-bar">
+                <div class="filter-label"><i class="fa-solid fa-filter"></i> Filters:</div>
+
+                <select class="filter-select" id="gf-bu">
+                    <option value="">Business Unit: All</option>
+                    <option>Cloud Infrastructure</option>
+                    <option>Enterprise AI</option>
+                    <option>Cybersecurity</option>
+                    <option>Global Services</option>
+                </select>
+
+                <select class="filter-select" id="gf-dept">
+                    <option value="">Department: All</option>
+                    <option>Engineering</option>
+                    <option>Product Management</option>
+                    <option>Operations</option>
+                    <option>Sales & Marketing</option>
+                </select>
+
+                <select class="filter-select" id="gf-location">
+                    <option value="">Location: All</option>
+                    <option>San Francisco, USA</option>
+                    <option>London, UK</option>
+                    <option>Singapore</option>
+                    <option>Berlin, Germany</option>
+                </select>
+
+                <select class="filter-select" id="gf-age">
+                    <option value="">Age Range: All</option>
+                    <option>
+                        < 30 Years</option>
+                    <option>30 - 45 Years</option>
+                    <option>46 - 55 Years</option>
+                    <option>55+ Years</option>
+                </select>
+
+                <select class="filter-select" id="gf-window">
+                    <option value="">Retirement Window: All</option>
+                    <option>In 2 Years</option>
+                    <option>In 5 Years</option>
+                    <option>10+ Years</option>
+                </select>
+
+                <button class="btn-reset-filters" onclick="resetGlobalFilters()"><i class="fa-solid fa-rotate-left"></i>
+                    Reset</button>
+            </div>
+
+            <!-- Content Views -->
+            <main class="content-area">
+
+                <!-- ==========================================================================
+           PAGE 1: EXECUTIVE DASHBOARD
+           ========================================================================== -->
+                <section id="page-dashboard" class="page-view active">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">Executive Workforce Dashboard</h1>
+                            <p class="page-subtitle">Real-time workforce demographics, retirement exposure, and
+                                strategic risk metrics.</p>
+                        </div>
+                        <div class="page-actions">
+                            <button class="btn btn-secondary" onclick="window.print()"><i class="fa-solid fa-print"></i>
+                                Print</button>
+                            <button class="btn btn-primary" onclick="navigate('page-simulator')"><i
+                                    class="fa-solid fa-wand-magic-sparkles"></i> Launch Simulator</button>
+                        </div>
+                    </div>
+
+                    <!-- KPI Cards Grid -->
+                    <div class="grid grid-cols-12" style="margin-bottom: 1.5rem;">
+                        <div class="card kpi-card col-span-3">
+                            <div class="kpi-top">
+                                <span class="kpi-title">Total Workforce</span>
+                                <div class="kpi-icon" style="background: var(--primary-light); color: var(--primary);">
+                                    <i class="fa-solid fa-users"></i></div>
+                            </div>
+                            <div class="kpi-value">4,865</div>
+                            <div class="kpi-footer">
+                                <span class="trend trend-up"><i class="fa-solid fa-arrow-up"></i> +3.2%</span>
+                                <span style="color: var(--text-muted);">vs last quarter</span>
+                            </div>
+                        </div>
+
+                        <div class="card kpi-card col-span-3">
+                            <div class="kpi-top">
+                                <span class="kpi-title">Avg Age / Experience</span>
+                                <div class="kpi-icon"
+                                    style="background: var(--secondary-light); color: var(--secondary);"><i
+                                        class="fa-solid fa-user-clock"></i></div>
+                            </div>
+                            <div class="kpi-value">43.8 <span style="font-size:1rem; font-weight:500;">/ 13.5y</span>
+                            </div>
+                            <div class="kpi-footer">
+                                <span class="trend trend-up"><i class="fa-solid fa-arrow-up"></i> +0.4y</span>
+                                <span style="color: var(--text-muted);">aging demographic</span>
+                            </div>
+                        </div>
+
+                        <div class="card kpi-card col-span-3">
+                            <div class="kpi-top">
+                                <span class="kpi-title">Retiring (2y / 5y)</span>
+                                <div class="kpi-icon" style="background: var(--danger-light); color: var(--danger);"><i
+                                        class="fa-solid fa-user-xmark"></i></div>
+                            </div>
+                            <div class="kpi-value" style="color: var(--danger);">214 <span
+                                    style="font-size:1rem; font-weight:500;">/ 618</span></div>
+                            <div class="kpi-footer">
+                                <span class="trend trend-down"><i class="fa-solid fa-triangle-exclamation"></i> High
+                                    Risk</span>
+                                <span style="color: var(--text-muted);">12.7% total workforce</span>
+                            </div>
+                        </div>
+
+                        <div class="card kpi-card col-span-3">
+                            <div class="kpi-top">
+                                <span class="kpi-title">Succession Coverage</span>
+                                <div class="kpi-icon" style="background: var(--success-light); color: var(--success);">
+                                    <i class="fa-solid fa-shield-check"></i></div>
+                            </div>
+                            <div class="kpi-value">71%</div>
+                            <div class="kpi-footer">
+                                <span class="trend trend-up"><i class="fa-solid fa-arrow-up"></i> +4%</span>
+                                <span style="color: var(--text-muted);">82 critical roles total</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Grid Row 1 -->
+                    <div class="grid grid-cols-12" style="margin-bottom: 1.5rem;">
+                        <div class="card col-span-8">
+                            <div class="card-header">
+                                <div class="card-title"><i class="fa-solid fa-chart-column"
+                                        style="color:var(--primary);"></i> Demographic Age Distribution & Retirement
+                                    Horizons</div>
+                            </div>
+                            <div id="chart-age-distribution" style="min-height: 300px;"></div>
+                        </div>
+
+                        <div class="card col-span-4">
+                            <div class="card-header">
+                                <div class="card-title"><i class="fa-solid fa-fire" style="color:var(--danger);"></i>
+                                    Department Retirement Risk</div>
+                            </div>
+                            <div id="chart-dept-risk" style="min-height: 300px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Grid Row 2 -->
+                    <div class="grid grid-cols-12" style="margin-bottom: 1.5rem;">
+                        <div class="card col-span-6">
+                            <div class="card-header">
+                                <div class="card-title"><i class="fa-solid fa-globe"
+                                        style="color:var(--accent-cyan);"></i> Location Retirement Heatmap</div>
+                            </div>
+                            <div id="chart-location-heatmap" style="min-height: 280px;"></div>
+                        </div>
+
+                        <div class="card col-span-6">
+                            <div class="card-header">
+                                <div class="card-title"><i class="fa-solid fa-chart-line"
+                                        style="color:var(--secondary);"></i> 5-Year Skill Loss vs Hiring Requirement
+                                    Forecast</div>
+                            </div>
+                            <div id="chart-skill-loss-forecast" style="min-height: 280px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Top Risks Table -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa-solid fa-triangle-exclamation"
+                                    style="color:var(--warning);"></i> Top 5 Critical Role Retirement Exposure</div>
+                            <button class="btn btn-secondary" style="padding: 0.3rem 0.7rem; font-size: 0.75rem;"
+                                onclick="navigate('page-retirement-risk')">View All Risks</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Employee</th>
+                                        <th>Role / Designation</th>
+                                        <th>Department</th>
+                                        <th>Age</th>
+                                        <th>Retirement Date</th>
+                                        <th>Critical Skill</th>
+                                        <th>Successor Status</th>
+                                        <th>Risk Score</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr onclick="openDrawer('EMP-1002')">
+                                        <td style="font-weight: 700;">Dr. Aris Thorne</td>
+                                        <td>Chief Nuclear Systems Engineer</td>
+                                        <td>Operations</td>
+                                        <td>63</td>
+                                        <td>2027-02-15</td>
+                                        <td>Nuclear Control Systems</td>
+                                        <td><span class="pill pill-red">No Successor</span></td>
+                                        <td><span class="risk-badge" style="background:var(--risk-red);">94/100</span>
+                                        </td>
+                                    </tr>
+                                    <tr onclick="openDrawer('EMP-1005')">
+                                        <td style="font-weight: 700;">Sarah Lin</td>
+                                        <td>Principal Enterprise AI Architect</td>
+                                        <td>Enterprise AI</td>
+                                        <td>61</td>
+                                        <td>2027-08-30</td>
+                                        <td>Tensor Processing / LLM Ops</td>
+                                        <td><span class="pill pill-yellow">1 Potential</span></td>
+                                        <td><span class="risk-badge" style="background:var(--risk-red);">88/100</span>
+                                        </td>
+                                    </tr>
+                                    <tr onclick="openDrawer('EMP-1009')">
+                                        <td style="font-weight: 700;">Marcus Vance</td>
+                                        <td>VP Global Cyber Defense</td>
+                                        <td>Cybersecurity</td>
+                                        <td>62</td>
+                                        <td>2027-11-10</td>
+                                        <td>Zero Trust Architecture</td>
+                                        <td><span class="pill pill-green">Ready Successor</span></td>
+                                        <td><span class="risk-badge"
+                                                style="background:var(--risk-orange);">76/100</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==========================================================================
+           PAGE 2: EMPLOYEE DIRECTORY
+           ========================================================================== -->
+                <section id="page-employees" class="page-view">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">Employee Directory</h1>
+                            <p class="page-subtitle">Searchable master record of all 4,865 active enterprise personnel.
+                            </p>
+                        </div>
+                        <button class="btn btn-primary"><i class="fa-solid fa-user-plus"></i> Add Employee</button>
+                    </div>
+
+                    <div class="card" style="margin-bottom: 1rem;">
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <input type="text" id="dir-search" class="search-input" style="flex:1;"
+                                placeholder="Filter by name, ID, title, or skill..."
+                                onkeyup="renderEmployeeDirectory()">
+                            <select class="filter-select" id="dir-dept-filter" onchange="renderEmployeeDirectory()">
+                                <option value="">All Departments</option>
+                                <option>Engineering</option>
+                                <option>Enterprise AI</option>
+                                <option>Cybersecurity</option>
+                                <option>Operations</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Department</th>
+                                        <th>Designation</th>
+                                        <th>Age</th>
+                                        <th>Experience</th>
+                                        <th>Critical Role</th>
+                                        <th>Retirement</th>
+                                        <th>Risk Score</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="directory-tbody">
+                                    <!-- Injected via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="pagination">
+                            <span style="color: var(--text-muted); font-size: 0.8rem;"
+                                id="directory-pagination-info">Showing 1 to 10 of 500 records</span>
+                            <div class="pagination-btns">
+                                <button class="page-btn"><i class="fa-solid fa-chevron-left"></i></button>
+                                <button class="page-btn active">1</button>
+                                <button class="page-btn">2</button>
+                                <button class="page-btn">3</button>
+                                <button class="page-btn"><i class="fa-solid fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==========================================================================
+           PAGE 3: EMPLOYEE PROFILE SPOTLIGHT
+           ========================================================================== -->
+                <section id="page-profile" class="page-view">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">Employee Profile & Succession Spotlight</h1>
+                            <p class="page-subtitle">Detailed talent profile, skill matrix, and succession readiness
+                                score.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-12">
+                        <div class="card col-span-4">
+                            <div
+                                style="text-align: center; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color);">
+                                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
+                                    style="width: 100px; height: 100px; border-radius: var(--radius-full); margin-bottom: 0.75rem; border: 3px solid var(--primary);"
+                                    alt="Elena">
+                                <h2 style="font-size: 1.2rem; font-weight: 800;">Marie Curie</h2>
+                                <p style="color: var(--text-muted); font-size: 0.85rem;">Chief People Officer & SVP HR
+                                </p>
+                                <span class="pill pill-red" style="margin-top: 0.5rem;"><i class="fa-solid fa-star"></i>
+                                    Critical Executive Role</span>
+                            </div>
+
+                            <div
+                                style="padding-top: 1rem; display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.85rem;">
+                                <div style="display: flex; justify-content: space-between;"><span
+                                        style="color: var(--text-muted);">Employee ID:</span><span
+                                        style="font-weight:700;">EMP-1001</span></div>
+                                <div style="display: flex; justify-content: space-between;"><span
+                                        style="color: var(--text-muted);">Age / DOB:</span><span
+                                        style="font-weight:700;">59 / 1967-04-12</span></div>
+                                <div style="display: flex; justify-content: space-between;"><span
+                                        style="color: var(--text-muted);">Total Experience:</span><span
+                                        style="font-weight:700;">24.5 Years</span></div>
+                                <div style="display: flex; justify-content: space-between;"><span
+                                        style="color: var(--text-muted);">Location:</span><span
+                                        style="font-weight:700;">San Francisco HQ</span></div>
+                                <div style="display: flex; justify-content: space-between;"><span
+                                        style="color: var(--text-muted);">Retirement Target:</span><span
+                                        style="font-weight:700; color:var(--danger);">2028-04-12 (2 Years)</span></div>
+                            </div>
+
+                            <div
+                                style="margin-top: 1.5rem; padding: 1rem; background: var(--danger-light); border-radius: var(--radius-md); text-align: center;">
+                                <div
+                                    style="font-size: 0.75rem; font-weight: 700; color: var(--danger); text-transform: uppercase;">
+                                    Retirement Risk Gauge</div>
+                                <div style="font-size: 2rem; font-weight: 800; color: var(--danger);">86 / 100</div>
+                                <div style="font-size: 0.75rem; color: var(--danger);">High Business Impact if Vacated
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card col-span-8">
+                            <div class="card-header">
+                                <div class="card-title"><i class="fa-solid fa-diagram-project"
+                                        style="color:var(--primary);"></i> Succession Pipeline & Identified Candidates
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-12" style="margin-bottom: 1.5rem;">
+                                <div class="card col-span-6"
+                                    style="border: 2px dashed var(--primary-border); background: var(--primary-light);">
+                                    <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary);">PRIMARY
+                                        SUCCESSOR (READY IN 1 YEAR)</div>
+                                    <div style="display: flex; gap: 0.75rem; margin-top: 0.75rem; align-items: center;">
+                                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80"
+                                            style="width: 50px; height: 50px; border-radius: var(--radius-full);"
+                                            alt="Candidate">
+                                        <div>
+                                            <div style="font-weight: 800;">David Miller</div>
+                                            <div style="font-size: 0.75rem; color: var(--text-muted);">VP Workforce
+                                                Analytics</div>
+                                            <span class="pill pill-green" style="margin-top:0.25rem;">88% Match
+                                                Confidence</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card col-span-6" style="border: 1px solid var(--border-color);">
+                                    <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">
+                                        SECONDARY SUCCESSOR (READY IN 3 YEARS)</div>
+                                    <div style="display: flex; gap: 0.75rem; margin-top: 0.75rem; align-items: center;">
+                                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&auto=format&fit=crop&q=80"
+                                            style="width: 50px; height: 50px; border-radius: var(--radius-full);"
+                                            alt="Candidate 2">
+                                        <div>
+                                            <div style="font-weight: 800;">Samantha Reed</div>
+                                            <div style="font-size: 0.75rem; color: var(--text-muted);">Global Talent
+                                                Director</div>
+                                            <span class="pill pill-yellow" style="margin-top:0.25rem;">72% Match
+                                                Confidence</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-title" style="margin-bottom: 0.75rem;"><i
+                                    class="fa-solid fa-list-check"></i> Critical Expertise & Skill Transfer Plan</div>
+                            <div id="chart-profile-skills" style="min-height: 220px;"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==========================================================================
+           PAGE 4: AGE ANALYTICS
+           ========================================================================== -->
+                <section id="page-age-analytics" class="page-view">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">Workforce Age Analytics & Demographics</h1>
+                            <p class="page-subtitle">Deep demographic breakdown, age distribution pyramids, and tenure
+                                analysis.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-12" style="margin-bottom: 1.5rem;">
+                        <div class="card col-span-6">
+                            <div class="card-header">
+                                <div class="card-title">Age Population Pyramid</div>
+                            </div>
+                            <div id="chart-pyramid" style="min-height: 320px;"></div>
+                        </div>
+                        <div class="card col-span-6">
+                            <div class="card-header">
+                                <div class="card-title">Average Age by Department vs Industry Benchmark</div>
+                            </div>
+                            <div id="chart-dept-age-comp" style="min-height: 320px;"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==========================================================================
+           PAGE 5: RETIREMENT RISK
+           ========================================================================== -->
+                <section id="page-retirement-risk" class="page-view">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">Retirement Exposure & Risk Matrix</h1>
+                            <p class="page-subtitle">Algorithmic risk evaluation based on age, role criticality, and
+                                successor gaps.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-12" style="margin-bottom: 1.5rem;">
+                        <div class="card col-span-12">
+                            <div class="card-header">
+                                <div class="card-title">Retirement Risk Bubble Matrix (Impact vs Window)</div>
+                            </div>
+                            <div id="chart-risk-bubble" style="min-height: 350px;"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==========================================================================
+           PAGE 6: CRITICAL ROLES
+           ========================================================================== -->
+                <section id="page-critical-roles" class="page-view">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">Critical Role Management</h1>
+                            <p class="page-subtitle">Monitoring 82 single-point-of-failure positions across the
+                                enterprise.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-12" style="margin-bottom: 1.5rem;">
+                        <div class="card kpi-card col-span-3">
+                            <span class="kpi-title">Total Critical Roles</span>
+                            <div class="kpi-value">82</div>
+                        </div>
+                        <div class="card kpi-card col-span-3">
+                            <span class="kpi-title">Fully Covered</span>
+                            <div class="kpi-value" style="color:var(--success);">58 (71%)</div>
+                        </div>
+                        <div class="card kpi-card col-span-3">
+                            <span class="kpi-title">High Risk / No Successor</span>
+                            <div class="kpi-value" style="color:var(--danger);">14 (17%)</div>
+                        </div>
+                        <div class="card kpi-card col-span-3">
+                            <span class="kpi-title">Retiring in 2 Years</span>
+                            <div class="kpi-value" style="color:var(--warning);">24 Roles</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==========================================================================
+           PAGE 7: SKILLS INVENTORY
+           ========================================================================== -->
+                <section id="page-skills-inventory" class="page-view">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">Enterprise Skills Inventory</h1>
+                            <p class="page-subtitle">Taxonomy of 100+ mapped technical and operational competencies.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-12">
+                        <div class="card col-span-12">
+                            <div class="card-header">
+                                <div class="card-title">Skill Concentration Treemap</div>
+                            </div>
+                            <div id="chart-skill-treemap" style="min-height: 380px;"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==========================================================================
+           PAGE 8: SKILL GAP ANALYSIS
+           ========================================================================== -->
+                <section id="page-skill-gap" class="page-view">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">Strategic Skill Gap Analysis</h1>
+                            <p class="page-subtitle">Projected competency deficiencies caused by impending retirements.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Competency / Skill</th>
+                                        <th>Current Experts</th>
+                                        <th>Retiring (3Y)</th>
+                                        <th>Future Gap</th>
+                                        <th>Impact Level</th>
+                                        <th>Recommended Mitigation</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="font-weight:700;">SAP S/4HANA Kernel Architecture</td>
+                                        <td>14 Experts</td>
+                                        <td><span style="color:var(--danger); font-weight:700;">8 (57%)</span></td>
+                                        <td>-6 Experts</td>
+                                        <td><span class="pill pill-red">Critical</span></td>
+                                        <td>Execute Upskilling Program & Immediate Hiring</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight:700;">Enterprise Cybersecurity & Zero Trust</td>
+                                        <td>32 Experts</td>
+                                        <td><span style="color:var(--warning); font-weight:700;">9 (28%)</span></td>
+                                        <td>-4 Experts</td>
+                                        <td><span class="pill pill-orange">High</span></td>
+                                        <td>Internal Mobility + Certifications</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight:700;">Cloud Native Kubernetes Operations</td>
+                                        <td>45 Experts</td>
+                                        <td><span style="color:var(--success); font-weight:700;">3 (6%)</span></td>
+                                        <td>Stable</td>
+                                        <td><span class="pill pill-green">Low</span></td>
+                                        <td>Maintain standard succession pipeline</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==========================================================================
+           PAGE 9: SUCCESSION PLANNING
+           ========================================================================== -->
+                <section id="page-succession" class="page-view">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">Succession Planning Tree & Pipeline</h1>
+                            <p class="page-subtitle">Visual hierarchy of key leadership positions and candidate
+                                readiness.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-12">
+                        <div class="card col-span-12" style="text-align: center; padding: 2rem;">
+                            <div class="card-title" style="justify-content: center; margin-bottom: 2rem;">Org Leadership
+                                Succession Tree (Chief Officers)</div>
+
+                            <div style="display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap;">
+                                <div class="org-node current" style="width: 240px;">
+                                    <span class="pill pill-red"
+                                        style="position: absolute; top: -10px; right: 10px;">Retiring 2027</span>
+                                    <div style="font-weight: 800; margin-top: 0.5rem;">Chief Executive Officer</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">Arthur Vance (Age 64)
+                                    </div>
+                                    <div
+                                        style="margin-top: 1rem; padding-top: 0.5rem; border-top: 1px solid var(--border-color); font-size: 0.75rem; font-weight: 700; color: var(--success);">
+                                        Successor: Marie Curie (Ready Now)
+                                    </div>
+                                </div>
+
+                                <div class="org-node current" style="width: 240px;">
+                                    <span class="pill pill-orange"
+                                        style="position: absolute; top: -10px; right: 10px;">Retiring 2028</span>
+                                    <div style="font-weight: 800; margin-top: 0.5rem;">Chief People Officer</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">Elena Rostova (Age 59)
+                                    </div>
+                                    <div
+                                        style="margin-top: 1rem; padding-top: 0.5rem; border-top: 1px solid var(--border-color); font-size: 0.75rem; font-weight: 700; color: var(--primary);">
+                                        Successor: David Miller (Ready 1y)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==========================================================================
+           PAGE 10: HIRING FORECAST
+           ========================================================================== -->
+                <section id="page-hiring-forecast" class="page-view">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">Strategic Hiring Forecast</h1>
+                            <p class="page-subtitle">Multi-year external recruitment and internal mobility requirements.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-12" style="margin-bottom: 1.5rem;">
+                        <div class="card col-span-12">
+                            <div class="card-header">
+                                <div class="card-title">1Y, 3Y, 5Y & 10Y Hiring Needs Projection</div>
+                            </div>
+                            <div id="chart-hiring-projection" style="min-height: 320px;"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==========================================================================
+           PAGE 11: TRAINING RECOMMENDATIONS
+           ========================================================================== -->
+                <section id="page-training" class="page-view">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">Upskilling & Training Recommendations</h1>
+                            <p class="page-subtitle">AI-suggested learning paths to accelerate successor readiness.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-12">
+                        <div class="card col-span-4 ai-card">
+                            <div
+                                style="font-size: 0.75rem; font-weight: 700; color: var(--primary); text-transform: uppercase;">
+                                RECOMMENDED PROGRAM #1</div>
+                            <h3 style="font-weight: 800; margin: 0.5rem 0;">Executive AI Architecture Acceleration</h3>
+                            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;">6-month
+                                intensive transition program for Senior Engineers to step into retiring Principal AI
+                                Architect roles.</p>
+                            <div style="font-size: 0.75rem; font-weight: 700;"><i class="fa-solid fa-user-check"></i> 28
+                                Candidates Enrolled</div>
+                        </div>
+
+                        <div class="card col-span-4 ai-card">
+                            <div
+                                style="font-size: 0.75rem; font-weight: 700; color: var(--primary); text-transform: uppercase;">
+                                RECOMMENDED PROGRAM #2</div>
+                            <h3 style="font-weight: 800; margin: 0.5rem 0;">SAP S/4HANA Knowledge Transfer Sprint</h3>
+                            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;">Mentorship
+                                pairing with retiring SAP experts to preserve core system institutional memory.</p>
+                            <div style="font-size: 0.75rem; font-weight: 700;"><i class="fa-solid fa-user-check"></i> 14
+                                Candidates Enrolled</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==========================================================================
+           PAGE 12: WORKFORCE SIMULATOR (THE STAR INTERACTIVE VIEW)
+           ========================================================================== -->
+                <section id="page-simulator" class="page-view">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title"><i class="fa-solid fa-wand-magic-sparkles"
+                                    style="color:var(--primary);"></i> Strategic Workforce Simulator</h1>
+                            <p class="page-subtitle">Simulate real-time impact of changing retirement ages, attrition,
+                                growth, and automation parameters.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-12">
+                        <!-- Control Panel (Left Column) -->
+                        <div class="card col-span-4 simulator-container">
+                            <div class="card-title" style="margin-bottom: 1.25rem;"><i class="fa-solid fa-sliders"></i>
+                                Simulation Parameters</div>
+
+                            <div class="slider-group">
+                                <div class="slider-header">
+                                    <span>Retirement Age Threshold</span>
+                                    <span id="val-ret-age" style="font-weight:800; color:var(--primary);">60
+                                        Years</span>
+                                </div>
+                                <input type="range" min="55" max="65" value="60" class="range-slider" id="sim-ret-age"
+                                    oninput="updateSimulator()">
+                            </div>
+
+                            <div class="slider-group">
+                                <div class="slider-header">
+                                    <span>Annual Growth Rate</span>
+                                    <span id="val-growth" style="font-weight:800; color:var(--primary);">+5%</span>
+                                </div>
+                                <input type="range" min="-5" max="20" value="5" class="range-slider" id="sim-growth"
+                                    oninput="updateSimulator()">
+                            </div>
+
+                            <div class="slider-group">
+                                <div class="slider-header">
+                                    <span>Expected Attrition Rate</span>
+                                    <span id="val-attrition" style="font-weight:800; color:var(--primary);">8%</span>
+                                </div>
+                                <input type="range" min="2" max="25" value="8" class="range-slider" id="sim-attrition"
+                                    oninput="updateSimulator()">
+                            </div>
+
+                            <div class="slider-group">
+                                <div class="slider-header">
+                                    <span>Automation / AI Substitution</span>
+                                    <span id="val-automation" style="font-weight:800; color:var(--primary);">12%</span>
+                                </div>
+                                <input type="range" min="0" max="40" value="12" class="range-slider" id="sim-automation"
+                                    oninput="updateSimulator()">
+                            </div>
+
+                            <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;"
+                                onclick="resetSimulator()">Reset Default Scenario</button>
+                        </div>
+
+                        <!-- Dynamic Output Panel (Right Column) -->
+                        <div class="card col-span-8">
+                            <div class="card-header">
+                                <div class="card-title"><i class="fa-solid fa-chart-line"></i> Live Simulated Scenario
+                                    Output (3-Year Horizon)</div>
+                            </div>
+
+                            <div class="grid grid-cols-12" style="margin-bottom: 1rem;">
+                                <div class="card col-span-4" style="background: var(--bg-body); padding: 0.85rem;">
+                                    <div style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted);">
+                                        PROJECTED RETIREMENTS</div>
+                                    <div id="sim-kpi-retirements"
+                                        style="font-size: 1.5rem; font-weight: 800; color: var(--danger);">342</div>
+                                </div>
+                                <div class="card col-span-4" style="background: var(--bg-body); padding: 0.85rem;">
+                                    <div style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted);">NET
+                                        HIRING NEEDED</div>
+                                    <div id="sim-kpi-hiring"
+                                        style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">488</div>
+                                </div>
+                                <div class="card col-span-4" style="background: var(--bg-body); padding: 0.85rem;">
+                                    <div style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted);">TOTAL
+                                        REPLACEMENT COST</div>
+                                    <div id="sim-kpi-cost"
+                                        style="font-size: 1.5rem; font-weight: 800; color: var(--warning);">$14.2M</div>
+                                </div>
+                            </div>
+
+                            <div id="chart-simulator-output" style="min-height: 280px;"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==========================================================================
+           PAGE 13: AI INSIGHTS
+           ========================================================================== -->
+                <section id="page-ai-insights" class="page-view">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title"><i class="fa-solid fa-brain" style="color:var(--secondary);"></i> AI
+                                Executive Insights & Strategy</h1>
+                            <p class="page-subtitle">Generative workforce risk analysis synthesized from
+                                multi-department metrics.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-12">
+                        <div class="card col-span-12 ai-card" style="margin-bottom: 1.25rem;">
+                            <div
+                                style="font-size: 0.75rem; font-weight: 700; color: var(--primary); text-transform: uppercase;">
+                                <i class="fa-solid fa-sparkles"></i> AI CRITICAL EXECUTIVE BRIEF</div>
+                            <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0.5rem 0;">Imminent Skill Drain in
+                                Enterprise AI & Cloud Infrastructure</h3>
+                            <p style="font-size: 0.85rem; color: var(--text-secondary);">
+                                Our neural model predicts a <strong>42% loss in principal technical leads</strong>
+                                within 28 months due to concurrent retirements in European Operations. Existing
+                                succession pipelines cover only 38% of these roles. Immediate deployment of
+                                cross-skilling programs is required to prevent project delivery delays.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==========================================================================
+           PAGE 14: REPORTS
+           ========================================================================== -->
+                <section id="page-reports" class="page-view">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">Executive Reports & Exports</h1>
+                            <p class="page-subtitle">Generate board-ready reports in PDF, PPT, and Excel formats.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-12">
+                        <div class="card col-span-4">
+                            <div class="card-title" style="margin-bottom: 0.5rem;"><i class="fa-solid fa-file-pdf"
+                                    style="color:var(--danger);"></i> Board of Directors Succession Audit</div>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Complete
+                                executive summary of critical role exposure and 5-year succession readiness.</p>
+                            <button class="btn btn-secondary"
+                                onclick="alert('Exporting Board Succession Audit PDF...')"><i
+                                    class="fa-solid fa-download"></i> Download PDF</button>
+                        </div>
+
+                        <div class="card col-span-4">
+                            <div class="card-title" style="margin-bottom: 0.5rem;"><i
+                                    class="fa-solid fa-file-powerpoint" style="color:var(--warning);"></i> Strategic
+                                Workforce Deck 2026</div>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Slide deck
+                                containing demographic pyramids, hiring forecasts, and simulator scenarios.</p>
+                            <button class="btn btn-secondary" onclick="alert('Exporting Presentation Deck PPTX...')"><i
+                                    class="fa-solid fa-download"></i> Download PPTX</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==========================================================================
+           PAGE 15: NOTIFICATIONS
+           ========================================================================== -->
+                <section id="page-notifications" class="page-view">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">Notifications & System Alerts</h1>
+                            <p class="page-subtitle">Real-time alerts regarding impending retirements and unassigned
+                                succession roles.</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div
+                                style="display: flex; gap: 1rem; padding: 1rem; background: var(--danger-light); border-radius: var(--radius-md); align-items: center;">
+                                <i class="fa-solid fa-triangle-exclamation"
+                                    style="font-size: 1.5rem; color: var(--danger);"></i>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 800; color: var(--danger);">Critical Role Left Unassigned
+                                    </div>
+                                    <div style="font-size: 0.8rem; color: var(--text-primary);">Dr. Aris Thorne (Chief
+                                        Nuclear Engineer) has no identified primary successor and reaches retirement in
+                                        12 months.</div>
+                                </div>
+                                <button class="btn btn-primary" style="padding: 0.3rem 0.8rem; font-size: 0.75rem;"
+                                    onclick="navigate('page-succession')">Assign Now</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==========================================================================
+           PAGE 16: SETTINGS
+           ========================================================================== -->
+                <section id="page-settings" class="page-view">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">System Settings & Rules</h1>
+                            <p class="page-subtitle">Configure enterprise parameters, risk weighting algorithms, and
+                                retirement thresholds.</p>
+                        </div>
+                    </div>
+
+                    <div class="card" style="max-width: 600px;">
+                        <div class="slider-group">
+                            <div class="slider-header">
+                                <span>Standard Statutory Retirement Age</span>
+                                <span style="font-weight: 800;">62 Years</span>
+                            </div>
+                            <input type="range" min="55" max="68" value="62" class="range-slider">
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+     SLIDE-OVER DRAWER (EMPLOYEE DETAILS)
+     ========================================================================== -->
+    <div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+    <div class="drawer" id="employee-drawer">
+        <div class="drawer-header">
+            <div style="font-weight: 800; font-size: 1rem;">Employee Profile Detail</div>
+            <button class="icon-btn" onclick="closeDrawer()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="drawer-body" id="drawer-content">
+            <!-- Injected dynamically via JS -->
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+     JAVASCRIPT LOGIC & ENGINE
+     ========================================================================== -->
+    <script>
+        /* ==========================================================================
+           DATA GENERATOR ENGINE (500 EMPLOYEES & SIMULATION DATA)
+           ========================================================================== */
+        const DEPARTMENTS = ['Engineering', 'Enterprise AI', 'Cybersecurity', 'Operations', 'Global Services', 'Product Management'];
+        const LOCATIONS = ['San Francisco, USA', 'London, UK', 'Singapore', 'Berlin, Germany', 'Tokyo, Japan'];
+        const FIRST_NAMES = ['Alexander', 'Elena', 'Marcus', 'Sophia', 'David', 'Sarah', 'Aris', 'Viktor', 'Amara', 'Lucas'];
+        const LAST_NAMES = ['Rostova', 'Thorne', 'Vance', 'Miller', 'Lin', 'Reed', 'Kovacs', 'Chen', 'Patel', 'Zhang'];
+        const TITLES = ['Principal Software Architect', 'Chief Nuclear Engineer', 'VP Cyber Security', 'AI Research Lead', 'Operations Director'];
+
+        let employeeDatabase = [];
+
+        function generateEmployees() {
+            for (let i = 1001; i <= 1500; i++) {
+                const age = Math.floor(Math.random() * (65 - 24 + 1)) + 24;
+                const dept = DEPARTMENTS[Math.floor(Math.random() * DEPARTMENTS.length)];
+                const loc = LOCATIONS[Math.floor(Math.random() * LOCATIONS.length)];
+                const fname = FIRST_NAMES[Math.floor(Math.random() * FIRST_NAMES.length)];
+                const lname = LAST_NAMES[Math.floor(Math.random() * LAST_NAMES.length)];
+                const title = TITLES[Math.floor(Math.random() * TITLES.length)];
+                const critical = Math.random() < 0.2;
+                const riskScore = age > 58 ? Math.floor(Math.random() * 30) + 70 : Math.floor(Math.random() * 50);
+
+                employeeDatabase.push({
+                    id: `EMP-${i}`,
+                    name: `${fname} ${lname}`,
+                    dept: dept,
+                    title: title,
+                    age: age,
+                    exp: Math.max(1, age - 22),
+                    critical: critical,
+                    retYear: 2026 + (62 - age),
+                    riskScore: riskScore,
+                    location: loc
+                });
+            }
+        }
+
+        generateEmployees();
+
+        /* ==========================================================================
+           ROUTING & NAVIGATION SYSTEM
+           ========================================================================== */
+        function navigate(pageId) {
+            document.querySelectorAll('.page-view').forEach(view => view.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+
+            // Highlight current nav item
+            const navLink = document.querySelector(`.nav-item[onclick="navigate('${pageId}')"]`);
+            if (navLink) navLink.classList.add('active');
+
+            // Trigger Chart Resize/Re-render for responsive rendering
+            window.dispatchEvent(new Event('resize'));
+        }
+
+        /* ==========================================================================
+           THEME TOGGLE SYSTEM (DARK / LIGHT MODE)
+           ========================================================================== */
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+
+            const icon = document.getElementById('theme-icon');
+            icon.className = newTheme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        }
+
+        /* ==========================================================================
+           EMPLOYEE DIRECTORY RENDERER & INTERACTION
+           ========================================================================== */
+        function renderEmployeeDirectory() {
+            const tbody = document.getElementById('directory-tbody');
+            const searchTerm = document.getElementById('dir-search').value.toLowerCase();
+            const deptFilter = document.getElementById('dir-dept-filter').value;
+
+            if (!tbody) return;
+
+            let filtered = employeeDatabase.filter(emp => {
+                const matchesSearch = emp.name.toLowerCase().includes(searchTerm) || emp.id.toLowerCase().includes(searchTerm) || emp.title.toLowerCase().includes(searchTerm);
+                const matchesDept = deptFilter === '' || emp.dept === deptFilter;
+                return matchesSearch && matchesDept;
+            });
+
+            tbody.innerHTML = filtered.slice(0, 10).map(emp => `
+      <tr onclick="openDrawer('${emp.id}')">
+        <td style="font-weight:700;">${emp.id}</td>
+        <td style="font-weight:700;">${emp.name}</td>
+        <td>${emp.dept}</td>
+        <td>${emp.title}</td>
+        <td>${emp.age}</td>
+        <td>${emp.exp}y</td>
+        <td>${emp.critical ? '<span class="pill pill-red">Critical</span>' : '<span class="pill pill-green">Standard</span>'}</td>
+        <td>${emp.retYear}</td>
+        <td><span class="risk-badge" style="background:${emp.riskScore > 75 ? 'var(--risk-red)' : emp.riskScore > 50 ? 'var(--risk-orange)' : 'var(--risk-green)'}">${emp.riskScore}/100</span></td>
+      </tr>
+    `).join('');
+
+            document.getElementById('directory-pagination-info').innerText = `Showing 1 to 10 of ${filtered.length} records`;
+        }
+
+        /* ==========================================================================
+           SLIDE-OVER DRAWER CONTROL
+           ========================================================================== */
+        function openDrawer(empId) {
+            const emp = employeeDatabase.find(e => e.id === empId) || employeeDatabase[0];
+            const drawer = document.getElementById('employee-drawer');
+            const overlay = document.getElementById('drawer-overlay');
+            const content = document.getElementById('drawer-content');
+
+            content.innerHTML = `
+      <div style="text-align:center; margin-bottom:1.5rem;">
+        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" style="width:80px; height:80px; border-radius:50%; margin-bottom:0.5rem;" alt="Emp">
+        <h3 style="font-weight:800;">${emp.name}</h3>
+        <p style="color:var(--text-muted); font-size:0.85rem;">${emp.title}</p>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:0.75rem; font-size:0.85rem;">
+        <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-muted);">Department:</span> <strong>${emp.dept}</strong></div>
+        <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-muted);">Location:</span> <strong>${emp.location}</strong></div>
+        <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-muted);">Age / Experience:</span> <strong>${emp.age} Years / ${emp.exp}y</strong></div>
+        <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-muted);">Retirement Target:</span> <strong>${emp.retYear}</strong></div>
+        <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-muted);">Risk Score:</span> <strong style="color:var(--danger);">${emp.riskScore}/100</strong></div>
+      </div>
+
+      <button class="btn btn-primary" style="width:100%; margin-top:2rem;" onclick="navigate('page-profile'); closeDrawer();">Open Full Talent Spotlight</button>
+    `;
+
+            overlay.classList.add('active');
+            drawer.classList.add('active');
+        }
+
+        function closeDrawer() {
+            document.getElementById('drawer-overlay').classList.remove('active');
+            document.getElementById('employee-drawer').classList.remove('active');
+        }
+
+        /* ==========================================================================
+           WORKFORCE SIMULATOR ENGINE (INTERACTIVE DYNAMIC CALCULATIONS)
+           ========================================================================== */
+        let simulatorChart = null;
+
+        function updateSimulator() {
+            const retAge = parseInt(document.getElementById('sim-ret-age').value);
+            const growth = parseInt(document.getElementById('sim-growth').value);
+            const attrition = parseInt(document.getElementById('sim-attrition').value);
+            const automation = parseInt(document.getElementById('sim-automation').value);
+
+            // Update Slider Labels
+            document.getElementById('val-ret-age').innerText = `${retAge} Years`;
+            document.getElementById('val-growth').innerText = `${growth >= 0 ? '+' : ''}${growth}%`;
+            document.getElementById('val-attrition').innerText = `${attrition}%`;
+            document.getElementById('val-automation').innerText = `${automation}%`;
+
+            // Dynamic Computations
+            const baseWorkforce = 4865;
+            const retiringRatio = Math.max(0.02, (65 - retAge) * 0.035);
+            const projectedRetirements = Math.round(baseWorkforce * retiringRatio);
+
+            const grossNewRoles = Math.round(baseWorkforce * (growth / 100));
+            const grossAttrition = Math.round(baseWorkforce * (attrition / 100));
+            const totalReplacementNeed = projectedRetirements + grossAttrition + grossNewRoles;
+
+            const automatedOffload = Math.round(totalReplacementNeed * (automation / 100));
+            const netHiringNeed = Math.max(0, totalReplacementNeed - automatedOffload);
+
+            const totalCost = ((netHiringNeed * 28000) / 1000000).toFixed(1);
+
+            // Update Simulated Indicators
+            document.getElementById('sim-kpi-retirements').innerText = projectedRetirements;
+            document.getElementById('sim-kpi-hiring').innerText = netHiringNeed;
+            document.getElementById('sim-kpi-cost').innerText = `$${totalCost}M`;
+
+            // Update Dynamic Chart
+            if (simulatorChart) {
+                simulatorChart.updateSeries([
+                    { name: 'Retirements', data: [projectedRetirements, Math.round(projectedRetirements * 1.1), Math.round(projectedRetirements * 1.25)] },
+                    { name: 'Net Hiring Need', data: [netHiringNeed, Math.round(netHiringNeed * 1.05), Math.round(netHiringNeed * 1.12)] }
+                ]);
+            }
+        }
+
+        function resetSimulator() {
+            document.getElementById('sim-ret-age').value = 60;
+            document.getElementById('sim-growth').value = 5;
+            document.getElementById('sim-attrition').value = 8;
+            document.getElementById('sim-automation').value = 12;
+            updateSimulator();
+        }
+
+        /* ==========================================================================
+           APEXCHARTS INITIALIZATION ENGINE
+           ========================================================================== */
+        window.addEventListener('DOMContentLoaded', () => {
+            renderEmployeeDirectory();
+
+            // Chart 1: Dashboard Age Distribution
+            new ApexCharts(document.querySelector("#chart-age-distribution"), {
+                series: [{ name: 'Workforce Count', data: [420, 1250, 1840, 980, 375] }],
+                chart: { type: 'bar', height: 300, toolbar: { show: false }, fontFamily: 'inherit' },
+                colors: ['#2563eb'],
+                plotOptions: { bar: { borderRadius: 6, columnWidth: '45%' } },
+                xaxis: { categories: ['< 30 Yrs', '30-42 Yrs', '43-52 Yrs', '53-60 Yrs', '60+ Yrs'] }
+            }).render();
+
+            // Chart 2: Dept Risk
+            new ApexCharts(document.querySelector("#chart-dept-risk"), {
+                series: [44, 28, 18, 10],
+                labels: ['Engineering', 'Operations', 'AI & Cloud', 'Global Services'],
+                chart: { type: 'donut', height: 300, fontFamily: 'inherit' },
+                colors: ['#ef4444', '#f97316', '#eab308', '#2563eb']
+            }).render();
+
+            // Chart 3: Location Heatmap / Bar
+            new ApexCharts(document.querySelector("#chart-location-heatmap"), {
+                series: [{ name: 'Retirements (2y)', data: [84, 52, 41, 25, 12] }],
+                chart: { type: 'bar', height: 280, toolbar: { show: false }, fontFamily: 'inherit' },
+                colors: ['#0891b2'],
+                xaxis: { categories: ['San Francisco', 'London', 'Singapore', 'Berlin', 'Tokyo'] }
+            }).render();
+
+            // Chart 4: Skill Loss Forecast
+            new ApexCharts(document.querySelector("#chart-skill-loss-forecast"), {
+                series: [
+                    { name: 'Expiring Experts', data: [35, 62, 98, 142, 214] },
+                    { name: 'Replacement Cadre', data: [20, 45, 70, 110, 160] }
+                ],
+                chart: { type: 'line', height: 280, toolbar: { show: false }, fontFamily: 'inherit' },
+                colors: ['#ef4444', '#10b981'],
+                stroke: { curve: 'smooth', width: 3 },
+                xaxis: { categories: ['2026', '2027', '2028', '2029', '2030'] }
+            }).render();
+
+            // Chart 5: Employee Profile Skills Radar
+            new ApexCharts(document.querySelector("#chart-profile-skills"), {
+                series: [{ name: 'Competency Level', data: [95, 90, 85, 70, 92] }],
+                chart: { type: 'radar', height: 220, toolbar: { show: false }, fontFamily: 'inherit' },
+                xaxis: { categories: ['Exec Leadership', 'Org Design', 'Succession Strategy', 'AI Analytics', 'Change Mgmt'] },
+                colors: ['#2563eb']
+            }).render();
+
+            // Chart 6: Age Pyramid
+            new ApexCharts(document.querySelector("#chart-pyramid"), {
+                series: [
+                    { name: 'Male', data: [200, 450, 600, 320, 120] },
+                    { name: 'Female', data: [-180, -420, -580, -300, -110] }
+                ],
+                chart: { type: 'bar', height: 320, stacked: true, toolbar: { show: false }, fontFamily: 'inherit' },
+                colors: ['#2563eb', '#ec4899'],
+                plotOptions: { bar: { horizontal: true, barHeight: '80%' } },
+                xaxis: { categories: ['20-29', '30-39', '40-49', '50-59', '60+'] }
+            }).render();
+
+            // Chart 7: Department Age Comparison
+            new ApexCharts(document.querySelector("#chart-dept-age-comp"), {
+                series: [{ name: 'Avg Age', data: [46.2, 44.8, 41.5, 39.2, 45.0] }],
+                chart: { type: 'bar', height: 320, toolbar: { show: false }, fontFamily: 'inherit' },
+                colors: ['#4f46e5'],
+                xaxis: { categories: ['Operations', 'Engineering', 'Cybersecurity', 'Enterprise AI', 'Global Services'] }
+            }).render();
+
+            // Chart 8: Risk Bubble
+            new ApexCharts(document.querySelector("#chart-risk-bubble"), {
+                series: [{
+                    name: 'Critical Roles',
+                    data: [
+                        [2, 94, 30], [3, 88, 25], [1, 76, 20], [5, 60, 15], [4, 82, 35]
+                    ]
+                }],
+                chart: { type: 'bubble', height: 350, toolbar: { show: false }, fontFamily: 'inherit' },
+                colors: ['#ef4444'],
+                xaxis: { title: { text: 'Years to Retirement' } },
+                yaxis: { title: { text: 'Business Impact Score' } }
+            }).render();
+
+            // Chart 9: Skills Treemap
+            new ApexCharts(document.querySelector("#chart-skill-treemap"), {
+                series: [{
+                    data: [
+                        { x: 'SAP Architecture', y: 218 },
+                        { x: 'Cloud Engineering', y: 149 },
+                        { x: 'Cybersecurity', y: 184 },
+                        { x: 'AI Model Ops', y: 135 },
+                        { x: 'Legacy Systems', y: 84 }
+                    ]
+                }],
+                chart: { type: 'treemap', height: 380, toolbar: { show: false }, fontFamily: 'inherit' },
+                colors: ['#2563eb', '#0d9488', '#f97316', '#6366f1', '#ef4444']
+            }).render();
+
+            // Chart 10: Hiring Forecast
+            new ApexCharts(document.querySelector("#chart-hiring-projection"), {
+                series: [
+                    { name: 'External Hiring', data: [120, 240, 410, 780] },
+                    { name: 'Internal Promotions', data: [80, 180, 310, 520] }
+                ],
+                chart: { type: 'area', height: 320, toolbar: { show: false }, fontFamily: 'inherit' },
+                colors: ['#2563eb', '#10b981'],
+                xaxis: { categories: ['1 Year', '3 Years', '5 Years', '10 Years'] }
+            }).render();
+
+            // Chart 11: Simulator Output Chart
+            simulatorChart = new ApexCharts(document.querySelector("#chart-simulator-output"), {
+                series: [
+                    { name: 'Retirements', data: [342, 376, 427] },
+                    { name: 'Net Hiring Need', data: [488, 512, 546] }
+                ],
+                chart: { type: 'bar', height: 280, toolbar: { show: false }, fontFamily: 'inherit' },
+                colors: ['#ef4444', '#2563eb'],
+                plotOptions: { bar: { borderRadius: 4, columnWidth: '50%' } },
+                xaxis: { categories: ['Year 1', 'Year 2', 'Year 3'] }
+            });
+            simulatorChart.render();
+        });
+
+        /* ==========================================================================
+           GLOBAL FILTER & UTILITY ACTIONS
+           ========================================================================== */
+        function resetGlobalFilters() {
+            document.querySelectorAll('.filter-select').forEach(select => select.selectedIndex = 0);
+            renderEmployeeDirectory();
+        }
+
+        function exportData() {
+            alert('Generating enterprise workforce data export package (CSV/XLSX)...');
+        }
+
+        function toggleSidebar(forceState) {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            const isActive = sidebar.classList.contains('active');
+
+            if (typeof forceState === 'boolean') {
+                sidebar.classList.toggle('active', forceState);
+                overlay.classList.toggle('active', forceState);
+            } else {
+                sidebar.classList.toggle('active', !isActive);
+                overlay.classList.toggle('active', !isActive);
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 1200) {
+                toggleSidebar(false);
+            }
+        });
+    </script>
+</body>
+
+</html>
